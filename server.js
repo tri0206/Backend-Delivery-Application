@@ -7,9 +7,17 @@ const cors = require('cors');
 const passport = require('passport')
 const multer = require('multer');
 const serviceAccount = require('./serviceAccountKey.json');
+const io = require('socket.io')(server);
+const ordersDeliverySocket = require('./sockets/orders_delivery_socket');
 const admin = require('firebase-admin');
 
+
 const users = require('./routes/usersRoutes');
+const categories = require('./routes/categoriesRoutes');
+const products = require('./routes/productsRoutes');
+const address = require('./routes/addressRoutes');
+const orders = require('./routes/ordersRoutes');
+
 const port = process.env.PORT || 3000;
 
 admin.initializeApp({
@@ -41,7 +49,14 @@ app.disable('x-powered-by');
 
 app.set('port', port);
 
-users(app);
+
+users(app, upload);
+categories(app, upload);
+products(app, upload);
+address(app);
+orders(app);
+
+ordersDeliverySocket(io);
 
 server.listen(3000, '192.168.1.101' || 'localhost', function () {
     console.log('Aplicacion  NodeJS ' + port + ' Started...')

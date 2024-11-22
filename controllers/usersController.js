@@ -21,6 +21,20 @@ module.exports = {
         }
     },
 
+    async findDeliveryMen(req, res, next) {
+        try {
+            const data = await User.findDeliveryMen();
+
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Error getting users'
+            });
+        }
+    },
     async register(req, res, next) {
         try {
             const user = req.body;
@@ -88,6 +102,7 @@ module.exports = {
                     roles: myUser.roles
                 };
 
+                await User.updateSessionToken(myUser.id, `JWT ${token}`);
                 return res.status(201).json({
                     success: true,
                     message: 'Login Success',
@@ -115,7 +130,7 @@ module.exports = {
 
         try {
 
-            console.log('Usuario', req.body.user);
+            console.log('User', req.body.user);
 
             const user = JSON.parse(req.body.user); // CLIENTE MUST SEND US A USER OBJECT
             console.log('Parsed User', user);
@@ -151,6 +166,59 @@ module.exports = {
             });
         }
 
-    }
+    },
 
+    async updateWithoutImage(req, res, next) {
+
+        try {
+
+            console.log('User', req.body);
+
+            const user = req.body; // CLIENTE MUST SEND US A USER OBJECT
+            console.log('Parsed User', user);
+
+
+            await User.update(user); // SAVING THE URL IN THE DATABASE
+
+            return res.status(201).json({
+                success: true,
+                message: 'User data has been updated successfully',
+                data: user
+            });
+
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'There was an error updating user data',
+                error: error
+            });
+        }
+
+    },
+    async updateNotificationToken(req, res, next) {
+
+        try {
+
+            const user = req.body; // CLIENTE
+
+            await User.updateNotificationToken(user.id, user.notification_token)
+
+            return res.status(201).json({
+                success: true,
+                message: 'The notification token has been stored successfully'
+            });
+
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'There was an error updating the notification token',
+                error: error
+            });
+        }
+
+    },
 };
