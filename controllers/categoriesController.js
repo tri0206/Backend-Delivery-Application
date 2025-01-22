@@ -19,11 +19,9 @@ module.exports = {
 
                 const pathImage = `image_${Date.now()}`;
                 const url = await storage(files[0], pathImage);
-
                 if (url != undefined && url != null) {
                     category.image = url;
                 }
-
             }
 
             const data = await Category.create(category);

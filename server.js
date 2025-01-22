@@ -11,12 +11,18 @@ const io = require('socket.io')(server);
 const ordersDeliverySocket = require('./sockets/orders_delivery_socket');
 const admin = require('firebase-admin');
 
+//payment
+// const bodyParser = require("body-parser");
+// const axios = require("axios");
+// const crypto = require("crypto");
 
 const users = require('./routes/usersRoutes');
 const categories = require('./routes/categoriesRoutes');
 const products = require('./routes/productsRoutes');
 const address = require('./routes/addressRoutes');
 const orders = require('./routes/ordersRoutes');
+const discounts = require('./routes/discountsRoutes')
+const restaurants = require('./routes/restaurantsRoute')
 
 const port = process.env.PORT || 3000;
 
@@ -33,6 +39,9 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
+
+//payment
+// app.use(bodyParser.json());
 
 app.use(cors());
 app.use(passport.initialize());
@@ -55,14 +64,22 @@ categories(app, upload);
 products(app, upload);
 address(app);
 orders(app);
+discounts(app);
+restaurants(app, upload);
 
 ordersDeliverySocket(io);
+
+// //payment
+// const APP_ID = "2554"; // Thay bằng AppID từ ZaloPay
+// const KEY1 = "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn"; // Thay bằng Key1 từ ZaloPay
+// const CALLBACK_URL = "https://your-server.com/callback"; // URL callback
 
 server.listen(3000, '192.168.1.101' || 'localhost', function () {
     console.log('Aplicacion  NodeJS ' + port + ' Started...')
 });
-
-
+//192.168.1.80
+//192.168.1.101
+//192.168.100.178-s24U
 app.get('/', (req, res) => {
     res.send('Backend root route')
 });

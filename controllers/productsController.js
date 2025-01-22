@@ -6,7 +6,7 @@ module.exports = {
 
     async findByCategory(req, res, next) {
         try {
-            const id_category = req.params.id_category; // CLIENTE
+            const id_category = req.params.id_category;
             const data = await Product.findByCategory(id_category);
             return res.status(201).json(data);
         }
@@ -19,7 +19,38 @@ module.exports = {
             });
         }
     },
-
+    async findByRestaurant(req, res, next) {
+        try {
+            const id_restaurant = req.params.id_restaurant;
+            console.log(id_restaurant);
+            const data = await Product.findByRestaurant(id_restaurant);
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                message: `Lỗi khi liệt kê sản phẩm theo nhà hàng`,
+                success: false,
+                error: error
+            });
+        }
+    },
+    async findByCategoryOrName(req, res, next) {
+        try {
+            const keyword = req.params.keyword; // CLIENTE
+            console.log(keyword);
+            const data = await Product.findByCategoryOrName(keyword);
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                message: `Error listing products by category or by name`,
+                success: false,
+                error: error
+            });
+        }
+    },
     async create(req, res, next) {
 
         let product = JSON.parse(req.body.product);
@@ -37,7 +68,7 @@ module.exports = {
         else {
             try {
 
-                const data = await Product.create(product); // ALMACENANDO LA INFORMACION
+                const data = await Product.create(product);
                 product.id = data.id;
 
                 const start = async () => {
@@ -63,7 +94,7 @@ module.exports = {
                         if (inserts == files.length) {
                             return res.status(201).json({
                                 success: true,
-                                message: 'The product has been registered successfully'
+                                message: 'Sản phẩm đã được đăng ký thành công'
                             });
                         }
 
@@ -77,7 +108,7 @@ module.exports = {
             catch (error) {
                 console.log(`Error: ${error}`);
                 return res.status(501).json({
-                    message: `Error registering the product ${error}`,
+                    message: `Lỗi khi đăng ký sản phẩm ${error}`,
                     success: false,
                     error: error
                 });

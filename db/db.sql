@@ -1,8 +1,3 @@
-
-
-
-
-
 DROP TABLE IF EXISTS roles
 CASCADE;
 CREATE TABLE roles
@@ -57,9 +52,9 @@ INSERT INTO roles
     updated_at
     )
 VALUES(
-        'CLIENTE',
+        'CLIENT',
         'client/home',
-        'https://www.citypng.com/public/uploads/preview/hd-man-user-illustration-icon-transparent-png-701751694974843ybexneueic.png',
+        'https://s.net.vn/QSYW',
         '2024-10-20',
         '2024-10-20'	
 );
@@ -73,9 +68,9 @@ INSERT INTO roles
     updated_at
     )
 VALUES(
-        'RESTAURENTE',
+        'RESTAURANT',
         'restaurent/home',
-        'https://w7.pngwing.com/pngs/530/421/png-transparent-cafe-restaurant-computer-icons-hotel-chinese-cuisine-dining-food-text-cafe.png',
+        'https://cdn-icons-png.flaticon.com/512/6643/6643359.png',
         '2024-10-20',
         '2024-10-20'	
 );
@@ -90,9 +85,9 @@ INSERT INTO roles
     updated_at
     )
 VALUES(
-        'REPARTIDOR',
+        'REPARTITION',
         'delivery/home',
-        'https://w7.pngwing.com/pngs/332/444/png-transparent-delivery-computer-icons-restaurant-home-delivery-miscellaneous-angle-text.png',
+        'https://firebasestorage.googleapis.com/v0/b/kotlin-delivery-79773.appspot.com/o/delivery_man.png?alt=media&token=d6bea295-25fc-4645-8f27-1c05023f4ce8',
         '2024-10-20',
         '2024-10-20'	
 );
@@ -120,9 +115,11 @@ CREATE TABLE products
     image2 VARCHAR(255) NULL,
     image3 VARCHAR(255) NULL,
     id_category BIGINT NOT NULL,
+    id_restaurant BIGINT NOT NULL,
     created_at TIMESTAMP(0) NOT NULL,
     updated_at TIMESTAMP(0) NOT NULL,
-    FOREIGN KEY(id_category) REFERENCES categories(id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY(id_category) REFERENCES categories(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(id_restaurant) REFERENCES restaurants(id_restaurant) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS address
@@ -131,13 +128,15 @@ CREATE TABLE address
 (
     id BIGSERIAL PRIMARY KEY,
     id_user BIGINT NOT NULL,
+    id_restaurant BIGINT,
     address VARCHAR(255) NOT NULL,
     neighborhood VARCHAR(255) NOT NULL,
     lat DECIMAL DEFAULT 0,
     lng DECIMAL DEFAULT 0,
     created_at TIMESTAMP(0) NOT NULL,
     updated_at TIMESTAMP(0) NOT NULL,
-    FOREIGN KEY(id_user) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY(id_user) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(id_restaurant) REFERENCES restaurants(id_restaurant) ON UPDATE CASCADE ON DELETE CASCADE
 );
 DROP TABLE IF EXISTS orders
 CASCADE;
@@ -147,15 +146,19 @@ CREATE TABLE orders
     id_client BIGINT NOT NULL,
     id_delivery BIGINT NULL,
     id_address BIGINT NOT NULL,
+    id_restaurant INT NOT NULL,
     lat DECIMAL DEFAULT 0,
     lng DECIMAL DEFAULT 0,
     status VARCHAR(90) NOT NULL,
     timestamp BIGINT NOT NULL,
+    note VARCHAR(255) NULL,
+    payment VARCHAR(255) NOT NULL,
     created_at TIMESTAMP(0) NOT NULL,
     updated_at TIMESTAMP(0) NOT NULL,
     FOREIGN KEY(id_client) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(id_delivery) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY(id_address) REFERENCES address(id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY(id_address) REFERENCES address(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(id_restaurant) REFERENCES restaurants(id_restaurant) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS order_has_products
@@ -170,4 +173,36 @@ CREATE TABLE order_has_products
     PRIMARY KEY(id_order, id_product),
     FOREIGN KEY(id_order) REFERENCES orders(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(id_product) REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS discounts
+CASCADE;
+CREATE TABLE discounts
+(
+    id SERIAL PRIMARY KEY,
+    discount_type VARCHAR
+(50) NOT NULL,
+    value NUMERIC
+(10, 2),
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    product_id INT REFERENCES products
+(id),
+    created_at TIMESTAMP DEFAULT NOW
+(),
+    updated_at TIMESTAMP DEFAULT NOW
+()
+);
+
+DROP TABLE IF EXISTS restaurants
+CASCADE;
+CREATE TABLE restaurants
+(
+    id_restaurant SERIAL PRIMARY KEY,
+    id_user INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(15) UNIQUE NOT NULL,
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    FOREIGN KEY (id_user) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
 );

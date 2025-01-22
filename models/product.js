@@ -27,6 +27,54 @@ Product.findByCategory = (id_category) => {
     return db.manyOrNone(sql, id_category);
 }
 
+Product.findByRestaurant = (id_restaurant) => {
+    const sql = `
+    SELECT
+        P.id,
+        P.name,
+        P.description,
+        P.price,
+        P.image1,
+        P.image2,
+        P.image3,
+        P.id_category
+    FROM
+        products AS P
+    INNER JOIN
+        restaurants AS C
+    ON
+        P.id_restaurant = C.id_restaurant
+    WHERE
+        C.id_restaurant = $1
+    `;
+
+    return db.manyOrNone(sql, id_restaurant);
+}
+
+
+Product.findByCategoryOrName = (keyword) => {
+    const sql = `
+    SELECT
+        P.id,
+        P.name,
+        P.description,
+        P.price,
+        P.image1,
+        P.image2,
+        P.image3,
+        P.id_category
+    FROM
+        products AS P
+    INNER JOIN
+        categories AS C
+    ON
+        P.id_category = C.id
+    WHERE
+        P.name ILIKE '%' || $1 || '%' OR C.name ILIKE '%' || $1 || '%';
+    `;
+    const searchKeyword = `%${keyword}%`;
+    return db.manyOrNone(sql, [searchKeyword]);
+}
 
 Product.create = (product) => {
     const sql = `
@@ -39,10 +87,11 @@ Product.create = (product) => {
             image2,
             image3,
             id_category,
+            id_restaurant,
             created_at,
             updated_at
         )
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id
     `;
     return db.oneOrNone(sql, [
         product.name,
@@ -52,6 +101,7 @@ Product.create = (product) => {
         product.image2,
         product.image3,
         product.id_category,
+        product.id_restaurant,
         new Date(),
         new Date()
     ]);

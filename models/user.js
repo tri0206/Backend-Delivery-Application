@@ -80,6 +80,14 @@ User.findDeliveryMen = () => {
     return db.manyOrNone(sql);
 }
 
+User.findIdByEmail = (email) => {
+
+    const sql = `
+        SELECT U.id FROM users AS U WHERE U.email = $1;
+    `;
+
+    return db.oneOrNone(sql, email);
+}
 User.getAdminsNotificationsTokens = () => {
     const sql = `
     SELECT
@@ -145,6 +153,43 @@ User.findById = (id, callback) => {
 
     return db.oneOrNone(sql, id).then(user => { callback(null, user) })
 }
+User.findById1 = (id) => {
+    const sql = `
+    SELECT
+        U.id,
+        U.email,
+        U.firstname,
+        U.lastname,
+        U.image,
+        U.phone,
+        U.password,
+        U.session_token,
+        json_agg(
+            json_build_object(
+                'id', R.id,
+                'name', R.name,
+                'image', R.image,
+                'route', R.route
+            )
+        ) AS roles
+    FROM 
+        users AS U
+    INNER JOIN
+        user_has_roles AS UHR
+    ON
+        UHR.id_user = U.id
+    INNER JOIN
+        roles AS R
+    ON
+        R.id = UHR.id_rol
+    WHERE
+        U.id = $1
+    GROUP BY
+        U.id
+    `;
+
+    return db.oneOrNone(sql, id);
+}
 
 
 User.create = async (user) => {
@@ -180,6 +225,7 @@ User.create = async (user) => {
 
 User.update = (user) => {
 
+
     const sql = `
     UPDATE
         users
@@ -201,7 +247,23 @@ User.update = (user) => {
         user.image,
         new Date()
     ]);
+}
 
+User.resetPassword = async (id_user, newPassword) => {
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    const sql = `
+    Update
+        users
+    Set
+        password = $2
+    where 
+        id = $1
+    `;
+    return db.none(sql, [
+        id_user,
+        hash
+    ]);
 }
 
 

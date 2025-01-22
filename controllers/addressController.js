@@ -11,7 +11,7 @@ module.exports = {
 
             return res.status(201).json({
                 success: true,
-                message: 'The address was created correctly',
+                message: 'Địa chỉ đã được tạo đúng',
                 data: {
                     'id': data.id
                 }
@@ -22,7 +22,7 @@ module.exports = {
             console.log(`Error ${error}`);
             return res.status(501).json({
                 success: false,
-                message: 'There was an error creating the address',
+                message: 'Đã xảy ra lỗi khi tạo địa chỉ',
                 error: error
             });
         }
@@ -39,7 +39,7 @@ module.exports = {
             console.log(`Error ${error}`);
             return res.status(501).json({
                 success: false,
-                message: 'There was an error creating the address',
+                message: 'Đã xảy ra lỗi',
                 error: error
             });
         }

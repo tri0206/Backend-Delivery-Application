@@ -11,8 +11,10 @@ module.exports = (app, upload) => {
     app.get('/api/users/findDeliveryMen', passport.authenticate('jwt', { session: false }), UsersController.findDeliveryMen);
 
     app.post('/api/users/create', UsersController.register);
-
+    app.post('/api/users/registerRoles', UsersController.registerRoles);
+    app.post('/api/users/resetPassword', UsersController.resetPassword);
     app.post('/api/users/login', UsersController.login);
+    app.post('/api/users/changePassword', UsersController.changePassword);
 
 
 

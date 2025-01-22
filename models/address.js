@@ -32,10 +32,11 @@ Address.create = (address) => {
             neighborhood,
             lat,
             lng,
+            id_restaurant,
             created_at,
             updated_at
         )
-    VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
     `;
 
     return db.oneOrNone(sql, [
@@ -44,6 +45,7 @@ Address.create = (address) => {
         address.neighborhood,
         address.lat,
         address.lng,
+        address.id_restaurant,
         new Date(),
         new Date()
     ]);
