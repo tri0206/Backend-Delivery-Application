@@ -83,6 +83,30 @@ module.exports = {
 
     },
 
+    async findByStatus(req, res, next) {
+
+        try {
+            const status = req.params.status;
+            let data = await Order.findByStatus(status);
+
+            data.forEach(d => {
+                d.timestamp = timeRelative(new Date().getTime(), d.timestamp);
+            })
+
+
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error ${error}`);
+            return res.status(501).json({
+                message: 'There was an error trying to get orders by state',
+                error: error,
+                success: false
+            })
+        }
+
+    },
+
     async create(req, res, next) {
         try {
 
@@ -92,7 +116,6 @@ module.exports = {
 
             console.log('THE ORDER WAS CREATED CORRECTLY');
 
-            // BROWSE ALL PRODUCTS ADDED TO THE ORDER
             for (const product of order.products) {
                 await OrderHasProduct.create(data.id, product.id, product.quantity);
             }
@@ -122,15 +145,12 @@ module.exports = {
             let order = req.body;
             order.status = 'DISPATCHED';
             await Order.update(order);
-
-            const user = await User.getNotificationTokenById(order.id_delivery);
-
-
-            await pushNotificationController.sendNotification(user.notification_token, {
-                title: 'ORDER ASSIGNED',
-                body: 'You have been assigned an order',
-                id_notification: '2'
-            })
+            //const user = await User.getNotificationTokenById(order.id_delivery);
+            // await pushNotificationController.sendNotification(user.notification_token, {
+            //     title: 'ORDER ASSIGNED',
+            //     body: 'You have been assigned an order',
+            //     id_notification: '2'
+            // })
 
             return res.status(201).json({
                 success: true,
@@ -154,14 +174,14 @@ module.exports = {
             order.status = 'ON THE WAY';
             await Order.update(order);
 
-            const user = await User.getNotificationTokenById(order.id_client);
+            // const user = await User.getNotificationTokenById(order.id_client);
 
 
-            await pushNotificationController.sendNotification(user.notification_token, {
-                title: 'YOUR ORDER IS ON THE WAY',
-                body: 'A delivery person is on the way with your order.',
-                id_notification: '3'
-            })
+            // await pushNotificationController.sendNotification(user.notification_token, {
+            //     title: 'YOUR ORDER IS ON THE WAY',
+            //     body: 'A delivery person is on the way with your order.',
+            //     id_notification: '3'
+            // })
 
             return res.status(201).json({
                 success: true,

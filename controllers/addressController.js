@@ -43,6 +43,23 @@ module.exports = {
                 error: error
             });
         }
+    },
+
+    async findByRestaurant(req, res, next) {
+        try {
+
+            const id_restaurant = req.params.id_restaurant;
+            const data = await Address.findByUser(id_restaurant);
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Đã xảy ra lỗi',
+                error: error
+            });
+        }
     }
 
 }

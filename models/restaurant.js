@@ -140,6 +140,21 @@ Restaurant.findByCategory = (idCategory) => {
 
     return db.manyOrNone(sql, idCategory);
 };
+Restaurant.findByKeyword = (keyword) => {
+    const sql = `
+    SELECT DISTINCT R.id_restaurant, R.name, R.phone, R.description, R.status, R.image
+    FROM restaurants AS R
+    LEFT JOIN products AS P ON R.id_restaurant = P.id_restaurant
+    LEFT JOIN categories AS C ON P.id_category = C.id
+    WHERE 
+        R.name ILIKE $1 
+        OR P.name ILIKE $1 
+        OR C.name ILIKE $1;
+    `;
+    const searchKeyword = `%${keyword}%`;
+    return db.manyOrNone(sql, [searchKeyword]);
+};
+
 Restaurant.findRestaurantAddress = (id_restaurant) => {
     const sql = `
             SELECT 
@@ -158,6 +173,27 @@ Restaurant.findRestaurantAddress = (id_restaurant) => {
                 r.id_restaurant = $1;
     `;
     return db.manyOrNone(sql, id_restaurant);
+};
+
+
+Restaurant.findAddress = (id_restaurant) => {
+    const sql = `
+            SELECT 
+                a.id AS address_id,
+                a.address,
+                a.neighborhood,
+                a.lat,
+                a.lng
+            FROM 
+                address a
+            INNER JOIN 
+                restaurants r 
+            ON 
+                a.id_restaurant = r.id_restaurant
+            WHERE 
+                r.id_restaurant = $1;
+    `;
+    return db.oneOrNone(sql, id_restaurant);
 };
 
 module.exports = Restaurant;

@@ -115,6 +115,44 @@ module.exports = {
         }
     },
 
+    async findRestaurantById(req, res, next) {
+
+        try {
+
+            const restaurant = req.body;
+
+            const data = await Restaurant.findRestaurantById(restaurant.idRestaurant);
+            const address = await Restaurant.findAddress(restaurant.idRestaurant)
+            const myData = {
+                id_restaurant: data.id_restaurant,
+                id_user: data.id_user,
+                name: data.name,
+                description: data.description,
+                phone: data.phone,
+                image: data.image,
+                status: data.status,
+                res_address: address.address,
+                res_neighborhood: address.neighborhood,
+                lat: address.lat,
+                lng: address.lng
+            };
+            return res.status(201).json({
+                success: true,
+                message: 'Thành công!',
+                data: myData
+            });
+
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                success: false,
+                message: 'Đã xảy ra lỗi',
+                error: error
+            });
+        }
+    },
+
     async findRestaurantByCategory(req, res, next) {
 
         try {
@@ -166,6 +204,59 @@ module.exports = {
             return res.status(501).json({
                 success: false,
                 message: 'Đã xảy ra lỗi',
+                error: error
+            });
+        }
+    },
+
+    async findByQuery(req, res, next) {
+        try {
+            const keyword = req.params.query;
+            console.log(keyword);
+            const restaurants = await Restaurant.findByKeyword(keyword);
+            const restaurantData = await Promise.all(
+                restaurants.map(async (restaurant) => {
+                    const addressArray = await Restaurant.findRestaurantAddress(restaurant.id_restaurant);
+
+                    // Kiểm tra nếu mảng address không rỗng
+                    if (addressArray && addressArray.length > 0) {
+                        const address = addressArray[0]; // Lấy phần tử đầu tiên trong mảng
+
+                        return {
+                            id_restaurant: restaurant.id_restaurant,
+                            name: restaurant.name,
+                            description: restaurant.description,
+                            phone: restaurant.phone,
+                            image: restaurant.image,
+                            status: restaurant.status,
+                            res_address: address.address, // Địa chỉ
+                            res_neighborhood: address.neighborhood, // Khu vực
+                            lat: address.lat, // Vĩ độ
+                            lng: address.lng  // Kinh độ
+                        };
+                    } else {
+                        return {
+                            id_restaurant: restaurant.id_restaurant,
+                            name: restaurant.name,
+                            description: restaurant.description,
+                            phone: restaurant.phone,
+                            image: restaurant.image,
+                            status: restaurant.status,
+                            res_address: "No Address Available",
+                            res_neighborhood: "No Neighborhood Available",
+                            lat: null,
+                            lng: null
+                        };
+                    }
+                })
+            );
+            return res.status(201).json(restaurantData);
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                message: `Error listing restaurant by query`,
+                success: false,
                 error: error
             });
         }

@@ -13,6 +13,10 @@ module.exports = (app, upload) => {
 
     app.post('/api/restaurants/findByUser', RestaurantsController.findRestaurantByUser);
 
+    app.post('/api/restaurants/findById', RestaurantsController.findRestaurantById);
+
+    app.get('/api/restaurants/findByQuery/:query', passport.authenticate('jwt', { session: false }), RestaurantsController.findByQuery);
+
     // app.post('/api/restaurants/findByCategory', RestaurantsController.findRestaurantByCategory);
     app.get('/api/restaurants/findByCategory/:idCategory', passport.authenticate('jwt', { session: false }), RestaurantsController.findRestaurantByCategory);
 }

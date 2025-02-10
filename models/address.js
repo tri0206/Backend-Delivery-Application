@@ -22,6 +22,25 @@ Address.findByUser = (id_user) => {
 
 }
 
+Address.findByRestaurant = (id_restaurant) => {
+
+    const sql = `
+    SELECT
+        id,
+        id_user,
+        address,
+        neighborhood,
+        lat,
+        lng
+    FROM
+        address
+    WHERE
+        id_restaurant = $1
+    `;
+
+    return db.manyOrNone(sql, id_restaurant)
+
+}
 
 Address.create = (address) => {
     const sql = `

@@ -74,7 +74,7 @@ ordersDeliverySocket(io);
 // const KEY1 = "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn"; // Thay bằng Key1 từ ZaloPay
 // const CALLBACK_URL = "https://your-server.com/callback"; // URL callback
 
-server.listen(3000, '192.168.1.101' || 'localhost', function () {
+server.listen(3000, '192.168.1.81' || 'localhost', function () {
     console.log('Aplicacion  NodeJS ' + port + ' Started...')
 });
 //192.168.1.80

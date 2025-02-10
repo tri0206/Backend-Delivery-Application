@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 const storage = require('../utils/cloud_storage');
 const asyncForEach = require('../utils/async_foreach');
+const { log } = require('util');
 
 module.exports = {
 
@@ -19,11 +20,28 @@ module.exports = {
             });
         }
     },
+    async findByQuery(req, res, next) {
+        try {
+            const { query, idRestaurant } = req.params;
+
+            console.log({ query, idRestaurant });
+            const data = await Product.findByRestaurantAndKeyword(idRestaurant, query);
+            return res.status(201).json(data);
+        }
+        catch (error) {
+            console.log(`Error: ${error}`);
+            return res.status(501).json({
+                message: `Error listing products by query`,
+                success: false,
+                error: error
+            });
+        }
+    },
     async findByRestaurant(req, res, next) {
         try {
             const id_restaurant = req.params.id_restaurant;
             console.log(id_restaurant);
-            const data = await Product.findByRestaurant(id_restaurant);
+            const data = await Product.findAllByRestaurant(id_restaurant);
             return res.status(201).json(data);
         }
         catch (error) {
@@ -35,6 +53,25 @@ module.exports = {
             });
         }
     },
+
+    async getDiscountedProducts(req, res, next) {
+
+        try {
+
+            const data = await Product.findDiscountProduct();
+            console.log(data.id)
+            return res.status(201).json(data);
+
+        } catch (error) {
+            console.log('Error', error);
+            return res.status(501).json({
+                success: false,
+                message: 'There was an error find discounted products',
+                error: error
+            });
+        }
+    },
+
     async findByCategoryOrName(req, res, next) {
         try {
             const keyword = req.params.keyword; // CLIENTE
