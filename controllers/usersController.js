@@ -299,8 +299,8 @@ module.exports = {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'hduyen493@gmail.com', // Email của bạn
-                    pass: 'nbjm shqt aaml ihie'  // Mật khẩu ứng dụng email
+                    user: 'your_email', // Email của bạn
+                    pass: 'your_password'  // Mật khẩu ứng dụng email
                 }
             });
 
